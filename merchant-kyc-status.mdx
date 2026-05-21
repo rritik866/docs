@@ -1,13 +1,13 @@
 ---
-title: "Merchant KYC Status"
+title: "Merchant Onboarding Status"
 ---
 
-This endpoint enables an authorized Technology Service Provider (TSP Partner) to retrieve the real-time Verification / KYC status of a specific merchant mapped under their reseller account hierarchy.
+This endpoint enables an authorized Technology Service Provider (TSP Partner) to retrieve the real-time Verification / Onboarding status of a specific merchant mapped under their reseller account hierarchy.
 
 ## Integration Details
 
 - **HTTP Method:** `POST`
-- **Endpoint:** `/v2/partner/check-merchant-kyc-status`
+- **Endpoint:** `/v2/partner/merchant-onboarding-status`
 - **Authentication:** Required (Standard Partner Authorization)
 - **Supported Content-Types:** `application/json`, `application/x-www-form-urlencoded`
 
@@ -32,7 +32,7 @@ Submit the target merchant's identifier in the request body.
 
 ```json
 {
-  "merchant_id": "ACMEX6B9F2A"
+  "merchant_id": "ACMEX6B9F33"
 }
 ```
 
@@ -46,10 +46,10 @@ Returns the operational KYC status along with any related rejection/decline rema
 {
   "success": true,
   "statusCode": 200,
-  "msg": "Merchant KYC status retrieved successfully",
+  "msg": "Merchant onboarding status retrieved successfully",
   "data": {
     "merchantId": "ACMEX6B9F2A",
-    "kycStatus": "APPROVED", // PENDING, PROCESSING,RESUBMIT,DECLINED,APPROVED,SUBMITTED
+    "kycStatus": "APPROVED", // PENDING, SUBMITTED, UNDER_REVIEW, APPROVED, REJECTED, RESUBMIT, SUSPENDED
     "kycDeclineReason": null
   }
 }
@@ -61,7 +61,7 @@ Returns the operational KYC status along with any related rejection/decline rema
 - **`data.kycStatus`**: Current platform assessment status. Typical values include:
   - `"PENDING"`
   - `"APPROVED"`
-  - `"REJECTED"` / `"DECLINED"`
+  - `"REJECTED"` / `"SUSPENDED"`
 - **`data.kycDeclineReason`**: Explanatory string if the submission was rejected by the compliance team; otherwise returns `null`.
 
 ### Error Handling & Responses

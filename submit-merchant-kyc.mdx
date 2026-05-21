@@ -1,4 +1,95 @@
 ---
-title: 'Submit Merchant KYC'
+title: "Create Onboarding Link"
 ---
 
+This endpoint enables an authorized Technology Service Provider (TSP Partner) to generate a secure, temporary onboarding link for a specific merchant mapped under their reseller account hierarchy.
+
+## Integration Details
+
+- **HTTP Method:** `POST`
+- **Endpoint:** `/v2/partner/create-onboarding-link`
+- **Authentication:** Required (Standard Partner Authorization)
+- **Supported Content-Types:** `application/json`, `application/x-www-form-urlencoded`
+
+## Request Headers
+
+| Header | Type | Required | Description |
+| :-- | :-- | :-- | :-- |
+| `Authorization` | string | **Yes** | Your active TSP Partner access token. |
+| `Content-Type` | string | **Yes** | Specified payload format (e.g., `application/json`). |
+
+## Request Payload
+
+Submit the target merchant's identifier and redirection URL in the request body.
+
+### Parameters
+
+| Field | Type | Required | Description |
+| :-- | :-- | :-- | :-- |
+| `merchant_id` | string | **Yes** | The unique system `merchant_id` assigned to the sub-merchant. |
+| `return_url` | string | **Yes** | The URL where the merchant will be redirected upon completing the onboarding process. Must be a valid URL starting with `http:` or `https:`. |
+
+### Example Request (`application/json`)
+
+```json
+{
+  "merchant_id": "ACMEX6B9F33",
+  "return_url": "https://partner-portal.com/onboarding/callback"
+}
+```
+
+## Response Specifications
+
+### Successful Creation (`HTTP 200 OK`)
+
+Returns the generated onboarding link and expiration timestamp details.
+
+```json
+{
+  "success": true,
+  "statusCode": 200,
+  "msg": "Merchant onboarding link created successfully",
+  "data": {
+    "created_at": "2026-05-22T04:40:00.000Z",
+    "expire_at": "2026-05-22T05:10:00.000Z",
+    "onboarding_link": "https://onboarding.originpay.in/onboarding?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...&type=merchant"
+  }
+}
+```
+
+#### Response Field Definitions
+
+- **`data.created_at`**: ISO 8601 timestamp representing when the onboarding link was generated.
+- **`data.expire_at`**: ISO 8601 timestamp indicating when the onboarding link expires (expires in 30 minutes).
+- **`data.onboarding_link`**: The secure onboarding URL to redirect the merchant to.
+
+### Error Handling & Responses
+
+If the request violates validation constraints, authorization policies, or if the merchant status does not permit onboarding link generation, a structured error object is returned.
+
+#### Error Response Format
+
+```json
+{
+  "status": false,
+  "statusCode": 403,
+  "msg": "Merchant onboarding is already completed, cannot create new onboarding link"
+}
+```
+
+#### Typical Error Messages
+
+- **`400 Bad Request`**:
+  - `"Merchant id is required and must be a string"`
+  - `"Return url is required and must be a valid url"`
+  - `"Invalid return url protocol"`
+- **`403 Forbidden`**:
+  - `"Merchant onboarding is already completed, cannot create new onboarding link"`
+  - `"Merchant onboarding is already submitted, cannot create new onboarding link"`
+  - `"Merchant onboarding is already in review, cannot create new onboarding link"`
+  - `"Unfortunately, merchant account is suspended, cannot create new onboarding link"`
+  - `"Partner KYC not approved"`
+  - `"Business account disabled"`
+- **`404 Not Found`**:
+  - `"Merchant not found or not linked to this reseller"`
+  - `"Partner account not found"`
