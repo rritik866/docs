@@ -204,7 +204,8 @@
                       "create-a-merchant",
                       "merchant-kyc-status",
                       "submit-merchant-kyc"
-                    ]
+                    ],
+                    "expanded": true
                   }
                 ]
               }
