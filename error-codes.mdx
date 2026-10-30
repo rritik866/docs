@@ -1,0 +1,153 @@
+---
+title: "Error Codes & Handling"
+---
+
+Originpay APIs use conventional HTTP response status codes to indicate the outcome of an API request. In addition to the HTTP code, every failed response contains a structured JSON payload with a descriptive error message to help you identify and resolve the issue quickly.
+
+---
+
+## 1. Error Response Structure
+
+All error responses return `success: false` and follow this standard schema:
+
+```json
+{
+  "success": false,
+  "statusCode": 400,
+  "message": "Amount must be a whole number (in paise) between 1 and 1000000. Decimals are not allowed."
+}
+```
+
+### Response Schema Fields
+
+| Field | Type | Description |
+| :-- | :-- | :-- |
+| `success` | `boolean` | Always `false` for failed or rejected requests. |
+| `statusCode` | `integer` | HTTP status code corresponding to the error. |
+| `message` | `string` | Human-readable explanation of why the request failed. |
+
+---
+
+## 2. HTTP Status Code Summary
+
+| Code | Status | Meaning |
+| :-- | :-- | :-- |
+| `400` | **Bad Request** | Malformed request body, missing mandatory fields, invalid data formats, or business rule validation failures. |
+| `401` | **Unauthorized** | Missing, malformed, or invalid Basic Authentication credentials or merchant ID mismatch. |
+| `403` | **Forbidden** | Merchant account is disabled or lacks permission to access the requested resource. |
+| `404` | **Not Found** | The specified merchant record, dynamic sub-merchant, or assigned payment gateway could not be found. |
+| `409` | **Conflict** | Resource conflict, such as a duplicate `merchantOrderId` or reaching the merchant's daily transaction limit. |
+| `500` | **Internal Server Error** | Unexpected server-side failure. Contact Originpay support if this persists. |
+| `503` | **Service Unavailable** | API or service module is temporarily offline for scheduled maintenance. |
+
+---
+
+## 3. Comprehensive Error Reference
+
+### 3.1 Authentication & Authorization (`401` & `403`)
+
+| HTTP Code | Error Message (`message`) | Cause & Recommended Action |
+| :-- | :-- | :-- |
+| `401` | `Authorization header is required and must be Basic token.` | The `Authorization` header is missing or does not start with `Basic `. Ensure credentials are provided. |
+| `401` | `Invalid Authorization header format.` | The token provided after `Basic ` is not valid Base64 or does not decode to `publicKey:secretKey`. |
+| `401` | `Invalid public key or secret key provided` | The API keys supplied do not match any active merchant credentials in the system. |
+| `401` | `Merchant info for merchant id '$MERCHANT_ID' not found` | The merchant ID in `X-MERCHANT-ID` was not found or the user account is inactive. |
+| `403` | `Business status is disabled, kindly contact support` | The merchant profile is marked inactive/disabled. Contact Originpay support to reactivate. |
+| `403` | `Not authorized to generate basic token` | Attempted to generate a token using an account type that is not authorized. |
+
+---
+
+### 3.2 Request Validation (`400 Bad Request`)
+
+#### Headers & Mode
+
+| HTTP Code | Error Message (`message`) | Cause & Recommended Action |
+| :-- | :-- | :-- |
+| `400` | `X-MERCHANT-ID header is required and must be a string` | The `X-MERCHANT-ID` header was omitted or passed as a non-string value. |
+| `400` | `Invalid merchant id.` | The `X-MERCHANT-ID` header does not match the merchant ID linked to your API credentials. |
+| `400` | `Invalid X-SOURCE value '<val>'. Allowed: API, SDK, CHECKOUT, PAYMENT_LINK.` | An unsupported value was sent in the `X-SOURCE` header. |
+| `400` | `Invalid X-SOURCE-CHANNEL value '<val>'. Allowed: web, android, ios.` | An unsupported value was sent in the `X-SOURCE-CHANNEL` header. |
+| `400` | `KYC verification not approved. Please complete the required steps` | Your merchant profile KYC status is not `APPROVED`. Complete KYC onboarding in the merchant dashboard before using live mode. |
+
+#### Amount & Currency
+
+| HTTP Code | Error Message (`message`) | Cause & Recommended Action |
+| :-- | :-- | :-- |
+| `400` | `Amount must be a whole number (in paise) between 1 and 1000000. Decimals are not allowed.` | The `amount` field is missing, not a whole integer, or outside the range of 1 to 1,000,000 paise (₹0.01 to ₹10,000.00). Decimals like `100.50` are strictly rejected. |
+| `400` | `Only INR currency is supported` | A currency other than `"INR"` was provided. |
+| `400` | `Amount does not match the transaction` | The `amount` provided in `/v2/order/command` does not match the original transaction amount. |
+
+#### Order & Expiry
+
+| HTTP Code | Error Message (`message`) | Cause & Recommended Action |
+| :-- | :-- | :-- |
+| `400` | `merchantOrderId must contain only alphabets and numbers. eg (ORDER12345)` | `merchantOrderId` contains special characters, spaces, hyphens, or underscores. Only alphanumeric characters (`A-Z`, `a-z`, `0-9`) are allowed. |
+| `400` | `merchantOrderId is required and must be a string` | The order ID was omitted in an Order Command request. |
+| `400` | `expireAfter must be between 300 and 900 seconds` | The session expiration duration is outside the permitted window of 5 minutes (300s) to 15 minutes (900s). |
+
+#### Customer Details
+
+| HTTP Code | Error Message (`message`) | Cause & Recommended Action |
+| :-- | :-- | :-- |
+| `400` | `Customer information is required` | The `customer` object is missing from the payload. |
+| `400` | `Customer name is required and must not exceed 255 characters` | Customer `name` is missing or exceeds 255 characters. |
+| `400` | `Valid customer email is required and must not exceed 255 characters` | Customer `email` is missing, exceeds 255 characters, or fails standard email regex format. |
+| `400` | `Customer phone is required and must not exceed 15 characters` | Customer `phone` is missing or exceeds 15 characters. |
+
+#### Payment Info & Routing
+
+| HTTP Code | Error Message (`message`) | Cause & Recommended Action |
+| :-- | :-- | :-- |
+| `400` | `Payment info is required` | The `paymentInfo` object is missing from the request. |
+| `400` | `Valid redirectUrl is required in paymentInfo` | `redirectUrl` is missing or not a valid URL (e.g. `https://example.com/callback`). |
+| `400` | `remark is required in paymentInfo and must not exceed 255 characters` | `remark` is missing or exceeds 255 characters. |
+| `400` | `Invalid payment methods provided` | The `methods` array contains invalid method names. Allowed: `upi`, `card`, `netbanking`, `wallet`. |
+| `400` | `Payment handler is required and must be of type STANDARD` | `paymentHandler` is missing or `paymentHandler.type` is not `"STANDARD"`. |
+| `400` | `gateway_reference_id must be a string and not exceed 255 characters` | The gateway reference ID in One Checkout is invalid or exceeds 255 characters. |
+| `400` | `oneSplit must be an object` | `oneSplit` in One Checkout is malformed (must be a JSON object). |
+| `400` | `originpay_sub_acc_id must be a string and not exceed 255 characters` | Sub-account ID in `oneSplit` is invalid or empty. |
+| `400` | `remark in oneSplit must be a string and not exceed 255 characters` | Split remark exceeds 255 characters. |
+
+#### User-Defined Fields (UDF)
+
+| HTTP Code | Error Message (`message`) | Cause & Recommended Action |
+| :-- | :-- | :-- |
+| `400` | `A maximum of 5 user-defined fields are allowed.` | You passed more than 5 custom metadata fields at the root level of the payload. |
+| `400` | `<field_name> must not exceed 25 characters.` | A custom field value exceeds the 25-character maximum length limit. |
+
+#### Order Command & Status
+
+| HTTP Code | Error Message (`message`) | Cause & Recommended Action |
+| :-- | :-- | :-- |
+| `400` | `transactionType is required and must be either STATUS or REFUND` | `transactionType` was omitted in `/v2/order/command`. |
+| `400` | `transactionType can be only STATUS or REFUND` | An unsupported transaction type was sent. |
+
+---
+
+### 3.3 Conflicts & Missing Resources (`404` & `409`)
+
+| HTTP Code | Error Message (`message`) | Cause & Recommended Action |
+| :-- | :-- | :-- |
+| `404` | `No valid gateway found` | No active payment processing gateway has been mapped to your merchant profile. Contact support. |
+| `409` | `merchantOrderId already exists` | An order with the specified `merchantOrderId` has already been created. Generate a new unique order ID for subsequent checkout requests. |
+| `409` | `Transaction limit reached for today` | Your merchant account has exceeded its allocated daily transaction volume limit (`daily_limit`). Contact support to increase your threshold. |
+
+---
+
+### 3.4 Service & Maintenance (`500` & `503`)
+
+| HTTP Code | Error Message (`message`) | Cause & Recommended Action |
+| :-- | :-- | :-- |
+| `503` | `APIs are currently down for maintenance` | Originpay V2 APIs are undergoing scheduled maintenance. Retry when maintenance completes or use the provided bypass code if authorized. |
+| `503` | `refund apis is currently down for maintanance` | The refund processing service is currently undergoing maintenance. |
+| `500` | `An error occurred: <details>` | An unhandled server error occurred during transaction execution. Originpay logs these automatically for investigation. |
+
+---
+
+## 4. Best Practices for Error Handling
+
+1. **Verify HTTP Status Codes First**: Always evaluate the HTTP status code before parsing the JSON response. Do not assume all responses are `200 OK`.
+2. **Handle Idempotency on 409 Conflict**: If a checkout creation fails with `merchantOrderId already exists`, verify the status of that order using `/v2/order/command` rather than immediately re-submitting.
+3. **Use Alphanumeric Order IDs**: Always generate clean order identifiers matching `^[a-zA-Z0-9]+$` to avoid validation errors.
+4. **Implement Exponential Backoff**: For `503 Service Unavailable` or transient network timeouts, retry requests with an exponential backoff strategy (e.g., retry after 1s, 2s, 4s, 8s).
+5. **Always Pass Integer Amounts in Paise**: Convert rupee amounts by multiplying by 100 and rounding to the nearest integer (`Math.round(amountInRupees * 100)`).

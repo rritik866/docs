@@ -1,0 +1,19 @@
+---
+title: "Introduction"
+---
+
+The **Order Status** endpoint (`transactionType: "STATUS"`) is a server-to-server verification API used to check the real-time payment status and complete attempt history of an existing order. It allows your backend to verify settlement, retrieve bank references (UTR), and prevent payment tampering before order fulfillment.
+
+---
+
+| **Environment** | **HTTP Method** | **API** |
+| :-- | :-- | :-- |
+| `Sandbox` | `POST` | [https://api-uat.originpay.in/v2/order/command](https://api-uat.originpay.in/v2/order/command) |
+| `Production` | `POST` | [https://api.originpay.in/v2/order/command](https://api.originpay.in/v2/order/command) |
+
+## What This API Does
+
+- **Real-Time Status Verification**: Confirms if the payment has succeeded (`SUCCESS`), is processing (`PENDING`), failed (`FAILED`), or expired (`EXPIRED`).
+- **Amount Validation**: Validates the expected order amount against Originpay's records to protect against amount tampering.
+- **Audit & Banking Details**: Returns full attempt logs including UTR, bank reference numbers, payer VPA, payment method, and attempt timestamps.
+- **Webhook Fallback**: Acts as the primary fallback to reconcile payments if webhook delivery fails or times out.

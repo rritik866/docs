@@ -137,45 +137,63 @@
               {
                 "group": "Get Started",
                 "pages": [
-                  "welcome"
+                  "welcome",
+                  "error-codes"
                 ]
               },
               {
                 "group": "Payments",
                 "pages": [
+                  "introduction",
+                  "authorization",
                   {
-                    "group": "Website Integration",
+                    "group": "Integration Type",
                     "icon": "globe",
                     "expanded": true,
                     "pages": [
                       {
-                        "group": "Standard Checkout",
+                        "group": "Originpay Hosted",
                         "expanded": true,
                         "pages": [
+                          "integration-steps",
                           {
-                            "group": "API Integration",
+                            "group": "Standard Checkout",
                             "pages": [
-                              "introduction",
-                              "integration-steps",
-                              {
-                                "group": "API Reference",
-                                "pages": [
-                                  "authorization",
-                                  {
-                                    "group": "Create Payment",
-                                    "pages": [
-                                      "initiate-payment"
-                                    ]
-                                  },
-                                  "order-status"
-                                ]
-                              }
+                              "initiate-payment"
+                            ]
+                          },
+                          {
+                            "group": "OneCheckout",
+                            "pages": [
+                              "initiate-one-checkout-payment"
                             ]
                           }
                         ]
                       }
                     ]
                   }
+                ]
+              },
+              {
+                "group": "Order Status",
+                "pages": [
+                  "introduction-2",
+                  "get-order-status"
+                ]
+              },
+              {
+                "group": "Refund API",
+                "pages": [
+                  "introduction-3",
+                  "initiate-refund"
+                ]
+              },
+              {
+                "group": "OneSplit",
+                "pages": [
+                  "introduction-4",
+                  "add-vendor",
+                  "split-settlement"
                 ]
               }
             ]

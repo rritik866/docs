@@ -2,7 +2,7 @@
 title: "Initiate Payment"
 ---
 
-The **Standard Checkout** endpoint is used to create a payment session and generate a secure checkout link for your customers. This endpoint requires a valid Bearer token and merchant identification.
+The **Standard Checkout** endpoint is used to create a payment session and generate a secure checkout link for your customers. This endpoint requires a valid Basic token and merchant identification.
 
 ---
 
@@ -18,7 +18,7 @@ The **Standard Checkout** endpoint is used to create a payment session and gener
 | **URL** | `/v2/checkout/pay` |
 | **Method** | `POST` |
 | **Content-Type** | `application/json` |
-| **Authentication** | Bearer Token (Authorization Header) |
+| **Authentication** | Basic Token (Authorization Header) |
 
 ---
 
@@ -26,8 +26,17 @@ The **Standard Checkout** endpoint is used to create a payment session and gener
 
 | Header | Value | Description |
 | --- | --- | --- |
-| `Authorization` | `Bearer <access_token>` | Access token generated from `/v2/auth/token` |
+| `Authorization` | `Basic <basic_token>` | Basic token generated from `/v2/auth/token` or `base64(public_key:secret_key)` |
 | `X-MERCHANT-ID` | `<your_merchant_id>` | Unique merchant identifier |
+
+### Optional Headers
+
+| Header | Value | Description |
+| --- | --- | --- |
+| `X-SOURCE` | `API` / `SDK` / `CHECKOUT` / `PAYMENT_LINK` | Request origin source (Default: `API`) |
+| `X-SOURCE-CHANNEL` | `web` / `android` / `ios` | Request channel platform (Default: `web`) |
+| `X-BROWSER-FINGERPRINT` | string | Optional client browser fingerprint |
+| `X-MERCHANT-APP-ID` | string | Optional merchant application identifier |
 
 ---
 
@@ -39,12 +48,12 @@ The request must be sent in JSON format.
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| `amount` | number | Yes | Amount in paise (1 INR = 100 paise). Range: 1 to 1,000,000 |
-| `currency` | string | No | Currency code. Default: `"INR"` |
-| `merchantOrderId` | string | Yes | Unique order ID from your system (alphanumeric) |
+| `amount` | number | Yes | Amount in paise (1 INR = 100 paise). Range: 1 to 1,000,000 (Whole integer only) |
+| `currency` | string | No | Currency code. Allowed: `"INR"`. Default: `"INR"` |
+| `merchantOrderId` | string | Yes | Unique order ID from your system. Alphanumeric only (`^[a-zA-Z0-9]+$`) |
 | `expireAfter` | number | No | Expiry time in seconds (300–900). Default: 300 |
-| `customer` | object | Yes | Customer details |
-| `paymentInfo` | object | Yes | Payment configuration |
+| `customer` | object | Yes | Customer identity information |
+| `paymentInfo` | object | Yes | Payment configuration and redirect details |
 | `paymentHandler` | object | Yes | Must be `{ "type": "STANDARD" }` |
 
 ---
@@ -53,8 +62,8 @@ The request must be sent in JSON format.
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| `name` | string | Yes | Full name of the customer |
-| `email` | string | Yes | Valid email address |
+| `name` | string | Yes | Full name of the customer (max 255 characters) |
+| `email` | string | Yes | Valid email address (max 255 characters) |
 | `phone` | string | Yes | Mobile number (max 15 characters) |
 
 ---
@@ -63,16 +72,16 @@ The request must be sent in JSON format.
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| `methods` | array | Yes | Allowed: `upi`, `card`, `netbanking`, `wallet` |
-| `remark` | string | No | Transaction note or purpose |
-| `redirectUrl` | string | Yes | URL where user is redirected after payment |
+| `redirectUrl` | string | Yes | Valid URL where user is redirected after payment |
+| `remark` | string | Yes | Transaction note or purpose (max 255 characters) |
+| `methods` | array | No | Allowed: `upi`, `card`, `netbanking`, `wallet` (Defaults to all) |
 
 ---
 
 ### Custom Fields
 
 - You can pass up to **5 additional fields** at the root level
-- Keys must be alphanumeric or underscores (max 25 characters)
+- Keys must match `^[a-zA-Z0-9_]{1,25}$` (max 25 characters)
 - Values must be strings (max 25 characters)
 
 ---
@@ -85,30 +94,18 @@ The request must be sent in JSON format.
 {
   "success": true,
   "statusCode": 200,
-  "msg": "Order created successfully",
+  "message": "Order created successfully",
   "data": {
-    "merchantOrderId": "TXN_98765",
-    "paymentUrl": "https://originpay.in/checkout/standard/pay_v2?token=eyJhbGci..."
+    "merchant_order_id": "ORDER12345",
+    "order_id": "100000045",
+    "payment_url": "https://checkout.originpay.in/standard/pay_v2?token=eyJhbGci..."
   }
 }
 ```
 
 ---
 
-## 5. Error Codes
-
-| Status Code | Message (`msg`) | Description |
-| --- | --- | --- |
-| `400` | Amount must be between 1 and 1000000 paise | Invalid amount |
-| `400` | Valid customer email is required | Invalid email format |
-| `400` | Payment handler is required and must be STANDARD | Invalid `paymentHandler` |
-| `409` | Merchant order id already exists | Duplicate order ID |
-| `409` | Transaction limit reached for today | Daily limit exceeded |
-| `503` | Payment APIs are currently down for maintenance | System under maintenance |
-
----
-
-## 6. Implementation Example
+## 5. Implementation Example
 
 ### JavaScript (Fetch)
 
@@ -138,26 +135,24 @@ const requestBody = {
   udf5: "Additional Info 5"
 };
 
-const response = await fetch('https://api.originpay.in/v2/checkout/pay', {
-  method: 'POST',
+const response = await fetch("https://api.originpay.in/v2/checkout/pay", {
+  method: "POST",
   headers: {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer YOUR_ACCESS_TOKEN',
-    'X-MERCHANT-ID': 'YOUR_MID'
+    "Content-Type": "application/json",
+    "Authorization": "Basic YOUR_BASIC_TOKEN",
+    "X-MERCHANT-ID": "YOUR_MID"
   },
   body: JSON.stringify(requestBody)
 });
+
+const result = await response.json();
 ```
 
 ---
 
 ## Important Notes
 
-- Ensure `merchantOrderId` is unique for every request
-- The generated `paymentUrl` is single-use and expires based on `expireAfter`
-- Always verify payment status via backend or webhook
-- Do not rely solely on frontend redirection for confirmation
-
----
-
-This endpoint is responsible for initiating the payment flow and securely redirecting users to the hosted checkout page.
+- Ensure `merchantOrderId` is unique for every request and contains only alphanumeric characters.
+- Amounts must always be integers specified in paise (e.g. ₹500.00 = `50000`).
+- The generated `payment_url` is single-use and expires according to `expireAfter`.
+- Always verify payment status via server-to-server Order Command API or webhooks; do not rely solely on frontend redirection for fulfillment.

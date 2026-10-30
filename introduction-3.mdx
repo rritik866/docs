@@ -1,0 +1,26 @@
+---
+title: "Introduction"
+---
+
+The **Refund** endpoint (`transactionType: "REFUND"`) is a server-to-server API used to initiate a full or partial refund for a successfully completed payment. It programmatically triggers a reversal of funds from your merchant balance back to the customer's original payment source (VPA/UPI, card, net banking, or wallet).
+
+---
+
+| **Environment** | **HTTP Method** | **API** |
+| :-- | :-- | :-- |
+| `Sandbox` | `POST` | [https://api-uat.originpay.in/v2/order/command](https://api-uat.originpay.in/v2/order/command) |
+| `Production` | `POST` | [https://api.originpay.in/v2/order/command](https://api.originpay.in/v2/order/command) |
+
+## What This API Does
+
+- **Automated Payment Reversal**: Initiates refunds directly from your backend without needing manual processing in the merchant dashboard.
+- **Source-Account Credit**: Routes the refunded amount back to the customer's original payment instrument (UPI account, debit/credit card, or net banking).
+- **Audit & Tracking**: Associates the refund request with the original `merchantOrderId` and generates a distinct refund reference for tracking and reconciliation.
+- **Automated Settlement Adjustments**: Adjusts merchant ledger balances and logs refund events for accounting and compliance.
+
+## When to Use This API
+
+- **Order Cancellations**: Customer cancels an order before delivery or service provisioning.
+- **Returns & Exchanges**: Product returned by customer according to your return policy.
+- **Duplicate Charges**: Customer was billed twice due to network retries or accidental double payments.
+- **Dispute Resolution**: Merchant proactively resolves a billing complaint or service dissatisfaction.

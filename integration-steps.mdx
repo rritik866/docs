@@ -6,9 +6,9 @@ Follow these steps to integrate **Originpay API v2** into your application using
 
 ---
 
-### 1. Generate Access Token (Authentication)
+### 1. Generate Basic Token (Authentication)
 
-Before making any payment request, you must generate a **Bearer token** using your API credentials.
+Before making any payment request, you must generate a **Basic token** using your API credentials.
 
 - **Endpoint:** `POST /v2/auth/token`
 - **Content-Type:** `application/x-www-form-urlencoded`
@@ -22,28 +22,28 @@ Before making any payment request, you must generate a **Bearer token** using yo
 
 - Your credentials are validated
 - Merchant status, KYC, and gateway availability are checked
-- A **JWT Bearer token** is issued (valid for 3600 seconds)
+- A **Basic auth token** is generated
 
 #### Usage:
 
 Include the token in all subsequent requests:
 
 ```text
-Authorization: Bearer <your_token>
+Authorization: Basic <your_token>
 ```
 
 ---
 
-### 2. Create Payment Session
+### 2. Create Standard/OneCheckout Session
 
 Once authenticated, create a payment session using the checkout API.
 
-- **Endpoint:** `POST /v2/checkout/pay`
+- **Endpoint:** `POST /v2/checkout/pay OR /v2/onecheckout/pay`
 - **Content-Type:** `application/json`
 
 #### Required Headers:
 
-- `Authorization: Bearer <your_token>`
+- `Authorization: Basic <your_token>`
 - `X-MERCHANT-ID: <your_merchant_id>`
 
 #### Request Includes:
@@ -106,12 +106,6 @@ This prevents issues like:
 
 Webhooks allow your server to receive real-time payment updates.
 
-#### Common Events:
-
-- `payment.success`
-- `payment.failed`
-- `payment.pending`
-
 #### Best Practices:
 
 - Verify webhook signature
@@ -132,7 +126,7 @@ Ensure your integration handles failures gracefully:
 
 ## Integration Flow Summary
 
-1. Generate Bearer Token
+1. Generate Basic Token
 2. Create Payment Session
 3. Redirect User to Checkout
 4. Customer Completes Payment
