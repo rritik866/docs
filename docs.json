@@ -138,6 +138,7 @@
                 "group": "Get Started",
                 "pages": [
                   "welcome",
+                  "authorization",
                   "error-codes"
                 ]
               },
@@ -145,7 +146,6 @@
                 "group": "Payments",
                 "pages": [
                   "introduction",
-                  "authorization",
                   {
                     "group": "Integration Type",
                     "icon": "globe",

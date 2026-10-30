@@ -1,3 +1,72 @@
 ---
 title: "Introduction"
 ---
+
+**OneSplit** is Originpay’s automated payment splitting solution designed for multi-vendor marketplaces, platforms, franchises, and aggregator business models. Available via the **One Checkout API**, OneSplit allows a platform to accept a single unified payment from a customer and automatically allocate settlement funds to a designated sub-account (`originpay_sub_acc_id`).
+
+---
+
+## 1. What is OneSplit?
+
+In traditional payment workflows, all incoming funds flow entirely to a single master merchant account, requiring complex manual reconciliation and separate payout transfers to vendors or partners.
+
+With **OneSplit**, payment distribution is configured at the moment the checkout session is created. Originpay captures the total transaction amount, accounts for platform fees and taxes, and tracks the funds directly against the vendor's sub-account for automated settlement.
+
+---
+
+## 2. Key Capabilities
+
+- **Single Customer Experience**: The customer completes one seamless payment on the checkout page without knowing the payment is being split behind the scenes.
+- **Direct Sub-Account Allocation**: Route sales proceeds to any active Originpay sub-account using its unique `originpay_sub_acc_id`.
+- **Custom Split Remark**: Tag each split with a custom reference or description (e.g., vendor order reference, commission category).
+- **Automated Fee & Tax Calculation**: Platform processing fees and applicable GST are automatically deducted before funds are credited to the sub-account ledger.
+- **Auditing & Reporting**: Both master merchants and sub-accounts receive itemized transaction events and attempt logs for transparent accounting.
+
+---
+
+## 3. How to Use OneSplit
+
+OneSplit is configured by passing the `oneSplit` object inside the `paymentHandler` object when creating an order via `POST /v2/onecheckout/pay`:
+
+```json
+{
+  "amount": 100000,
+  "currency": "INR",
+  "merchantOrderId": "ORDER10098",
+  "customer": {
+    "name": "John Doe",
+    "email": "john@example.com",
+    "phone": "9876543210"
+  },
+  "paymentInfo": {
+    "remark": "Marketplace purchase - Order #10098",
+    "redirectUrl": "https://marketplace.example.com/checkout/callback"
+  },
+  "paymentHandler": {
+    "type": "STANDARD",
+    "gateway_reference_id": "GW_REF_001",
+    "oneSplit": {
+      "originpay_sub_acc_id": "sub_acc_98765",
+      "remark": "Seller payout for Product SKU #551"
+    }
+  }
+}
+```
+
+---
+
+## 4. OneSplit Schema
+
+| Field | Type | Required | Constraints | Description |
+| :-- | :-- | :-- | :-- | :-- |
+| `originpay_sub_acc_id` | `string` | No | Max 255 chars | The unique identifier of the destination Originpay sub-account to which funds should be allocated. |
+| `remark` | `string` | No | Max 255 chars | Custom description, invoice reference, or purpose for the split allocation. |
+
+---
+
+## 5. Common Use Cases
+
+- **E-Commerce Marketplaces**: Split customer checkout payments between the marketplace platform fee and the third-party merchant selling the goods.
+- **Franchise Networks**: Centralized web checkout where sales are attributed to individual store branch sub-accounts.
+- **Service & On-Demand Apps**: Route service charges (e.g. consultations, deliveries, freelance work) to service providers while retaining platform commissions.
+- **Ticketing & Event Portals**: Direct ticket revenues to event organizers with separate deduction of convenience fees.
