@@ -36,33 +36,6 @@ title: "Webhooks / Callback"
     | `X-ORIGINPAY-SIGNATURE` | string | Optional | HMAC-SHA256 signature calculated with your Signing Secret |
     | `X-TIMESTAMP` | string | Yes | Unix timestamp in milliseconds when the webhook was generated |
 
-    | Description |
-    | :-- |
-    | Triggered when a payment attempt issuccessfully authorized and captured. |
-    | Triggered when a payment attempt fails, is declined, or expires. |
-    | Triggered when a refund request has been processed successfully. |
-
-    |  |
-    | :-- |
-
-    | Description |  |
-    | :-- | --- |
-    |  |  |
-    |  |  |
-    |  |  |
-    |  |  |
-    |  |  |
-    |  |  |
-    | Channel or sub-method (e.g. `UPI_INTENT`, `UPI_QR`, `DEBIT_CARD`) |  |
-    | Bank Unique Transaction Reference (UTR / RRN) |  |
-    | Bank transaction reference number |  |
-    | Customer name returned by the bank or payment method |  |
-    | Customer UPI Virtual Payment Address (for UPI payments) |  |
-    | Gateway error code (null for successful transactions) |  |
-    | Gateway failure description (null for successful transactions) |  |
-    | Echo of custom metadata values (`udf1` - `udf5`) sent during order creation |  |
-    | ISO timestamp when the order was created |  |
-
     ## Sample Callback Payloads
 
     ### Successful Payment (`payment.success`)
@@ -159,7 +132,7 @@ title: "Webhooks / Callback"
     - **Response Body**: Return a valid JSON response such as `{ "status": "success" }` or `{ "received": true }`.
     - **Timeout**: Respond within **5 seconds**. Originpay terminates the connection and flags a timeout if no response is received within this window.
 
-    ## 7. Webhook Retry Policy
+    ## Webhook Retry Policy
 
     If your server is unreachable, times out, or returns a non-200 HTTP response code, Originpay automatically retries the webhook delivery using an exponential backoff schedule:
 
@@ -171,7 +144,7 @@ title: "Webhooks / Callback"
     | Attempt 4 | 15 minutes |
     | Attempt 5 | 1 hour |
 
-    ## 8. Integration Best Practices
+    ## Integration Best Practices
 
     - **Idempotency**: Always verify whether the transaction or order has already been processed in your database before fulfilling items, as retries or network duplications can deliver the same webhook more than once.
     - **Acknowledge Quickly**: Validate the signature and acknowledge the request with `200 OK` immediately. Offload heavy operations (such as sending emails or third-party CRM syncing) to an asynchronous queue or background worker.
