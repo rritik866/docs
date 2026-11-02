@@ -4,8 +4,6 @@ title: "Integration Steps"
 
 Follow these steps to integrate **Originpay API v2** into your application using the Standard Checkout flow.
 
----
-
 ### 1. Generate Basic Token (Authentication)
 
 Before making any payment request, you must generate a **Basic token** using your API credentials.
@@ -32,8 +30,6 @@ Include the token in all subsequent requests:
 Authorization: Basic <your_token>
 ```
 
----
-
 ### 2. Create Standard/OneCheckout Session
 
 Once authenticated, create a payment session using the checkout API.
@@ -59,8 +55,6 @@ Once authenticated, create a payment session using the checkout API.
 - A secure **checkout session** is generated
 - A `paymentUrl` is returned
 
----
-
 ### 3. Redirect Customer to Checkout
 
 Use the `paymentUrl` received in the response to redirect your user to the hosted Originpay checkout page.
@@ -75,8 +69,6 @@ Use the `paymentUrl` received in the response to redirect your user to the hoste
 - Customer selects payment method (UPI, Card, etc.)
 - Payment is processed securely by Originpay
 
----
-
 ### 4. Handle Payment Completion
 
 After payment, the user is redirected back to your provided `redirectUrl`.
@@ -85,8 +77,6 @@ After payment, the user is redirected back to your provided `redirectUrl`.
 
 - Do not rely only on frontend success response
 - Always verify payment status from backend or webhook
-
----
 
 ### 5. Verify Payment Status (Recommended)
 
@@ -100,8 +90,6 @@ This prevents issues like:
 - Fake success responses
 - Tampered client-side data
 
----
-
 ### 6. Setup Webhooks (Recommended)
 
 Webhooks allow your server to receive real-time payment updates.
@@ -112,8 +100,6 @@ Webhooks allow your server to receive real-time payment updates.
 - Handle duplicate events (idempotency)
 - Respond with HTTP `200` to acknowledge receipt
 
----
-
 ### 7. Handle Errors & Retries
 
 Ensure your integration handles failures gracefully:
@@ -121,8 +107,6 @@ Ensure your integration handles failures gracefully:
 - Retry failed API calls when safe
 - Log all request/response data
 - Show proper error messages to users
-
----
 
 ## Integration Flow Summary
 

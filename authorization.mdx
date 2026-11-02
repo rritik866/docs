@@ -2,7 +2,7 @@
 title: "Authorization"
 ---
 
-The **Generate Authorization Token** endpoint is the entry point for all **Originpay API v2** requests. It authenticates your merchant account using API credentials and returns a short-lived **Bearer Token** required for accessing all protected endpoints.
+The **Generate Authorization Token** endpoint is the entry point for all **Originpay API v2** requests. It authenticates your merchant account using API credentials and returns a **Basic Token** required for accessing all protected endpoints.
 
 ---
 
@@ -13,10 +13,9 @@ The **Generate Authorization Token** endpoint is the entry point for all **Origi
 
 ## Overview
 
-To interact with any v2 payment APIs, you must first obtain an **access token**. This token:
+To interact with any v2 payment APIs, you must first obtain an **basic token**. This token:
 
 - Authenticates your requests
-- Is valid for a limited time (**3600 seconds**)
 - Must be included in the `Authorization` header
 
 ---
@@ -49,14 +48,12 @@ If authentication is successful and your account is eligible, the API returns:
 
 ```json
 {
-  "success": true,
-  "data": {
-    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "expires_in": 3600,
-    "issued_at": 1714131225,
-    "expires_at": 1714134825,
-    "token_type": "Bearer"
-  }
+    "success": true,
+    "data": {
+        "basic_token": "b3JncGF52Nwwevwvrftbynbvd==",
+        "token_type": "Basic",
+        "note": "Please do not share it with anyone"
+    }
 }
 ```
 
@@ -64,11 +61,8 @@ If authentication is successful and your account is eligible, the API returns:
 
 | Field | Description |
 | --- | --- |
-| `access_token` | JWT token used as `Bearer <token>` in headers |
-| `expires_in` | Token validity in seconds (default: 3600) |
-| `issued_at` | Token issued time (Unix timestamp, IST) |
-| `expires_at` | Token expiry time (Unix timestamp, IST) |
-| `token_type` | Always `Bearer` |
+| `basic_token` | Basic token used as `Basic <token>` in headers |
+| `token_type` | Always `Basic` |
 
 ---
 
@@ -77,7 +71,7 @@ If authentication is successful and your account is eligible, the API returns:
 Include the token in all protected API requests:
 
 ```http
-Authorization: Bearer <access_token>
+Authorization: Basic <access_token>
 ```
 
 ---
@@ -92,7 +86,7 @@ Before issuing a token, multiple validations are performed (KYC, status, gateway
 | `400` | KYC verification not approved | Merchant KYC is pending |
 | `401` | User key not found | Invalid API credentials |
 | `403` | Business status is disabled | Merchant account inactive |
-| `404` | No valid gateway found | No active gateway configured |
+| `404` | No active key found | No active gateway configured |
 | `503` | Payment APIs are currently down for maintenance | System maintenance |
 
 ---

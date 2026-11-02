@@ -146,6 +146,8 @@
                 "group": "Payments",
                 "pages": [
                   "introduction",
+                  "webhooks-callback",
+                  "upi-qr-intent",
                   {
                     "group": "Integration Type",
                     "icon": "globe",

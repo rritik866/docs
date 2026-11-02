@@ -1,0 +1,141 @@
+---
+title: "UPI QR / Intent"
+---
+
+The **UPI QR / Intent** API allows you to create dynamic UPI payments directly in your app or website. Instead of redirecting customers to a hosted checkout page, this endpoint returns a UPI payment string (`upi://pay?...`) that you can:
+
+- **Display as a QR code** on desktop/web for customers to scan and pay.
+- **Trigger as a direct payment link** on mobile devices to open UPI apps (Google Pay, PhonePe, Paytm, etc.).
+
+| **Environment** | **Method** | **Endpoint URL** |
+| :-- | :-- | :-- |
+| `Sandbox` | `POST` | `https://api-uat.originpay.in/v2/checkout/pay` |
+| `Production` | `POST` | `https://api.originpay.in/v2/checkout/pay` |
+
+## 1. Headers
+
+| Header | Value | Required | Description |
+| --- | --- | --- | --- |
+| `Authorization` | `Basic <your_basic_token>` | **Yes** | Your Base64-encoded `public_key:secret_key` |
+| `X-MERCHANT-ID` | `<your_merchant_id>` | **Yes** | Your unique Originpay Merchant ID |
+| `Content-Type` | `application/json` | **Yes** | Required for JSON request bodies |
+| `X-SOURCE` | `API` / `SDK` / `CHECKOUT` / `PAYMENT_LINK` | No | Request source (Default: `API`) |
+| `X-SOURCE-CHANNEL` | `web` / `android` / `ios` | No | Platform channel (Default: `web`) |
+| `X-BROWSER-FINGERPRINT` | string | No | Optional client browser fingerprint |
+| `X-MERCHANT-APP-ID` | string | No | Optional merchant application identifier |
+
+## 2. Request Parameters
+
+Send a JSON body with your order details and specify `requestType` inside `paymentHandler`.
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `amount` | number | **Yes** | Amount in paise (e.g. ₹500.00 = `50000`) |
+| `merchantOrderId` | string | **Yes** | Your unique order ID (alphanumeric only, e.g. `ORD12345`) |
+| `currency` | string | No | Defaults to `"INR"` |
+| `expireAfter` | number | No | QR validity in seconds (300 to 900, default is 300) |
+| `customer` | object | **Yes** | Contains customer `name`, `email`, and `phone` |
+| `paymentInfo` | object | **Yes** | Contains `redirectUrl` and `remark` |
+| `paymentHandler` | object | **Yes** | Must contain `{ "type": "STANDARD", "requestType": "UPIQR" }` or `"UPI_INTENT"` |
+
+### Supported `requestType` Values
+
+- **`"UPIQR"`**: Returns a dynamic UPI QR string to display on web pages.
+- **`"UPI_INTENT"`**: Returns a mobile intent deep link to open installed UPI apps directly.
+
+## 3. Example Request
+
+```json
+{
+  "amount": 50000,
+  "currency": "INR",
+  "merchantOrderId": "ORD1001",
+  "expireAfter": 300,
+  "customer": {
+    "name": "Alex Smith",
+    "email": "alex@example.com",
+    "phone": "9876543210"
+  },
+  "paymentInfo": {
+    "remark": "Order #1001 Payment",
+    "redirectUrl": "https://yourwebsite.com/payment/callback"
+  },
+  "paymentHandler": {
+    "type": "STANDARD",
+    "requestType": "UPIQR"
+  }
+}
+```
+
+## 4. Success Responses
+
+### For `requestType: "UPIQR"`
+
+```json
+{
+  "success": true,
+  "statusCode": 200,
+  "message": "UPI QR generated successfully",
+  "data": {
+    "merchant_order_id": "ORD1001",
+    "order_id": "100000045",
+    "upi_qr": "upi://pay?pa=originpay@icici&pn=Merchant+Name&mc=5411&tr=TXN100000045&am=500.00&cu=INR"
+  }
+}
+```
+
+### For `requestType: "UPI_INTENT"`
+
+```json
+{
+  "success": true,
+  "statusCode": 200,
+  "message": "UPI QR generated successfully",
+  "data": {
+    "merchant_order_id": "ORD1001",
+    "order_id": "100000045",
+    "upi_qr": "upi://pay?pa=originpay@icici&pn=Merchant+Name&mc=5411&tr=TXN100000045&am=500.00&cu=INR",
+    "upi_intent": "upi://pay?pa=originpay@icici&pn=Merchant+Name&mc=5411&tr=TXN100000045&am=500.00&cu=INR"
+  }
+}
+```
+
+## 5. Code Example
+
+```javascript
+const response = await fetch("https://api.originpay.in/v2/checkout/pay", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": "Basic YOUR_BASIC_TOKEN",
+    "X-MERCHANT-ID": "YOUR_MERCHANT_ID"
+  },
+  body: JSON.stringify({
+    amount: 50000,
+    merchantOrderId: "ORDER" + Date.now(),
+    customer: {
+      name: "BatMan",
+      email: "batman@example.com",
+      phone: "9999999999"
+    },
+    paymentInfo: {
+      remark: "Cart checkout",
+      redirectUrl: "https://yourwebsite.com/callback"
+    },
+    paymentHandler: {
+      type: "STANDARD",
+      requestType: "UPIQR"
+    }
+  })
+});
+
+const result = await response.json();
+
+if (result.success) {
+  console.log("UPI QR String:", result.data.upi_qr);
+}
+```
+
+## 6. How to Verify Payment
+
+After showing the QR code or triggering the intent, check the payment status from your backend using the [**Order Status API**](/get-order-status) (`POST /v2/order/command` with `transactionType: "STATUS"`), or listen for webhook notifications before fulfilling the customer's order.
