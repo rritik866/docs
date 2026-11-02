@@ -4,15 +4,11 @@ title: "Introduction"
 
 **OneSplit** is Originpay’s automated payment splitting solution designed for multi-vendor marketplaces, platforms, franchises, and aggregator business models. Available via the **One Checkout API**, OneSplit allows a platform to accept a single unified payment from a customer and automatically allocate settlement funds to a designated sub-account (`originpay_sub_acc_id`).
 
----
-
 ## 1. What is OneSplit?
 
 In traditional payment workflows, all incoming funds flow entirely to a single master merchant account, requiring complex manual reconciliation and separate payout transfers to vendors or partners.
 
 With **OneSplit**, payment distribution is configured at the moment the checkout session is created. Originpay captures the total transaction amount, accounts for platform fees and taxes, and tracks the funds directly against the vendor's sub-account for automated settlement.
-
----
 
 ## 2. Key Capabilities
 
@@ -21,8 +17,6 @@ With **OneSplit**, payment distribution is configured at the moment the checkout
 - **Custom Split Remark**: Tag each split with a custom reference or description (e.g., vendor order reference, commission category).
 - **Automated Fee & Tax Calculation**: Platform processing fees and applicable GST are automatically deducted before funds are credited to the sub-account ledger.
 - **Auditing & Reporting**: Both master merchants and sub-accounts receive itemized transaction events and attempt logs for transparent accounting.
-
----
 
 ## 3. How to Use OneSplit
 
@@ -53,16 +47,12 @@ OneSplit is configured by passing the `oneSplit` object inside the `paymentHandl
 }
 ```
 
----
-
 ## 4. OneSplit Schema
 
 | Field | Type | Required | Constraints | Description |
 | :-- | :-- | :-- | :-- | :-- |
 | `originpay_sub_acc_id` | `string` | No | Max 255 chars | The unique identifier of the destination Originpay sub-account to which funds should be allocated. |
 | `remark` | `string` | No | Max 255 chars | Custom description, invoice reference, or purpose for the split allocation. |
-
----
 
 ## 5. Common Use Cases
 

@@ -137,4 +137,4 @@ const result = await response.json();
 - Ensure `merchantOrderId` is unique for every request and contains only alphanumeric characters.
 - Amounts must always be integers specified in paise (e.g. ₹500.00 = `50000`).
 - The generated `payment_url` is single-use and expires according to `expireAfter`.
-- Always verify payment status via server-to-server Order Command API or webhooks, do not rely solely on frontend redirection for fulfillment.
+- Always verify payment status via server-to-server [Order Command API](/get-order-status) or [webhooks](/webhooks-callback), do not rely solely on frontend redirection for fulfillment.

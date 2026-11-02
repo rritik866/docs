@@ -4,8 +4,6 @@ title: "Error Codes & Handling"
 
 Originpay APIs use conventional HTTP response status codes to indicate the outcome of an API request. In addition to the HTTP code, every failed response contains a structured JSON payload with a descriptive error message to help you identify and resolve the issue quickly.
 
----
-
 ## 1. Error Response Structure
 
 All error responses return `success: false` and follow this standard schema:
@@ -26,8 +24,6 @@ All error responses return `success: false` and follow this standard schema:
 | `statusCode` | `integer` | HTTP status code corresponding to the error. |
 | `message` | `string` | Human-readable explanation of why the request failed. |
 
----
-
 ## 2. HTTP Status Code Summary
 
 | Code | Status | Meaning |
@@ -39,8 +35,6 @@ All error responses return `success: false` and follow this standard schema:
 | `409` | **Conflict** | Resource conflict, such as a duplicate `merchantOrderId` or reaching the merchant's daily transaction limit. |
 | `500` | **Internal Server Error** | Unexpected server-side failure. Contact Originpay support if this persists. |
 | `503` | **Service Unavailable** | API or service module is temporarily offline for scheduled maintenance. |
-
----
 
 ## 3. Comprehensive Error Reference
 
@@ -54,8 +48,6 @@ All error responses return `success: false` and follow this standard schema:
 | `401` | `Merchant info for merchant id '$MERCHANT_ID' not found` | The merchant ID in `X-MERCHANT-ID` was not found or the user account is inactive. |
 | `403` | `Business status is disabled, kindly contact support` | The merchant profile is marked inactive/disabled. Contact Originpay support to reactivate. |
 | `403` | `Not authorized to generate basic token` | Attempted to generate a token using an account type that is not authorized. |
-
----
 
 ### 3.2 Request Validation (`400 Bad Request`)
 
@@ -122,8 +114,6 @@ All error responses return `success: false` and follow this standard schema:
 | `400` | `transactionType is required and must be either STATUS or REFUND` | `transactionType` was omitted in `/v2/order/command`. |
 | `400` | `transactionType can be only STATUS or REFUND` | An unsupported transaction type was sent. |
 
----
-
 ### 3.3 Conflicts & Missing Resources (`404` & `409`)
 
 | HTTP Code | Error Message (`message`) | Cause & Recommended Action |
@@ -132,8 +122,6 @@ All error responses return `success: false` and follow this standard schema:
 | `409` | `merchantOrderId already exists` | An order with the specified `merchantOrderId` has already been created. Generate a new unique order ID for subsequent checkout requests. |
 | `409` | `Transaction limit reached for today` | Your merchant account has exceeded its allocated daily transaction volume limit (`daily_limit`). Contact support to increase your threshold. |
 
----
-
 ### 3.4 Service & Maintenance (`500` & `503`)
 
 | HTTP Code | Error Message (`message`) | Cause & Recommended Action |
@@ -141,8 +129,6 @@ All error responses return `success: false` and follow this standard schema:
 | `503` | `APIs are currently down for maintenance` | Originpay V2 APIs are undergoing scheduled maintenance. Retry when maintenance completes or use the provided bypass code if authorized. |
 | `503` | `refund apis is currently down for maintanance` | The refund processing service is currently undergoing maintenance. |
 | `500` | `An error occurred: <details>` | An unhandled server error occurred during transaction execution. Originpay logs these automatically for investigation. |
-
----
 
 ## 4. Best Practices for Error Handling
 

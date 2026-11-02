@@ -4,8 +4,6 @@ title: "Authorization"
 
 The **Generate Authorization Token** endpoint is the entry point for all **Originpay API v2** requests. It authenticates your merchant account using API credentials and returns a **Basic Token** required for accessing all protected endpoints.
 
----
-
 | **Environment** | **HTTP Method** | **API** |
 | :-- | :-- | :-- |
 | `Sandbox` | `POST` | [https://api-uat.originpay.in/v2/auth/token](https://api-uat.originpay.in/v2/auth/token) |
@@ -18,8 +16,6 @@ To interact with any v2 payment APIs, you must first obtain an **basic token**. 
 - Authenticates your requests
 - Must be included in the `Authorization` header
 
----
-
 ## Endpoint Details
 
 | Attribute | Value |
@@ -29,8 +25,6 @@ To interact with any v2 payment APIs, you must first obtain an **basic token**. 
 | **Content-Type** | `application/x-www-form-urlencoded` |
 | **Auth Method** | `Public Key & Secret Key` |
 
----
-
 ## Request Parameters
 
 Send the request body as **form-urlencoded data**:
@@ -39,8 +33,6 @@ Send the request body as **form-urlencoded data**:
 | --- | --- | --- | --- |
 | `public_key` | `string` | Yes | Your merchant public API key |
 | `secret_key` | `string` | Yes | Your merchant secret API key |
-
----
 
 ## Success Response
 
@@ -64,8 +56,6 @@ If authentication is successful and your account is eligible, the API returns:
 | `basic_token` | Basic token used as `Basic <token>` in headers |
 | `token_type` | Always `Basic` |
 
----
-
 ## Using the Token
 
 Include the token in all protected API requests:
@@ -73,8 +63,6 @@ Include the token in all protected API requests:
 ```http
 Authorization: Basic <access_token>
 ```
-
----
 
 ## Error Responses
 
@@ -89,8 +77,6 @@ Before issuing a token, multiple validations are performed (KYC, status, gateway
 | `404` | No active key found | No active gateway configured |
 | `503` | Payment APIs are currently down for maintenance | System maintenance |
 
----
-
 ## Implementation Examples
 
 ### CURL
@@ -101,8 +87,6 @@ curl -X POST https://api.originpay.in/v2/auth/token \
   -d "public_key=YOUR_PUBLIC_KEY" \
   -d "secret_key=YOUR_SECRET_KEY"
 ```
-
----
 
 ### Node.js (Axios)
 
@@ -123,8 +107,6 @@ axios.post('https://api.originpay.in/v2/auth/token', data, {
 .then(res => console.log(res.data))
 .catch(err => console.error(err.response?.data || err.message));
 ```
-
----
 
 ## Important Notes
 

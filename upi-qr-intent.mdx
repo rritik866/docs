@@ -138,4 +138,4 @@ if (result.success) {
 
 ## 6. How to Verify Payment
 
-After showing the QR code or triggering the intent, check the payment status from your backend using the [**Order Status API**](/get-order-status) (`POST /v2/order/command` with `transactionType: "STATUS"`), or listen for webhook notifications before fulfilling the customer's order.
+After showing the QR code or triggering the intent, check the payment status from your backend using the [**Order Status API**](/get-order-status) (`POST /v2/order/command` with `transactionType: "STATUS"`), or listen for [webhook](/webhooks-callback) notifications before fulfilling the customer's order.
