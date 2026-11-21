@@ -214,8 +214,7 @@
                     "group": "TSP Headers",
                     "pages": [
                       "authorization-1",
-                      "http-headers-standard",
-                      "tsp-http-headers-v2-custom"
+                      "http-headers-standard"
                     ]
                   },
                   {

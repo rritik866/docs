@@ -1,4 +1,83 @@
 ---
-title: 'HTTP Headers (Standard)'
+title: "HTTP Headers"
 ---
 
+## TSP HTTP Headers of Initiate Payment API
+
+You must include the following headers in all API requests to the Create Payment API (`/v2/checkout/pay`), based on your integration platform.
+
+All headers listed below are mandatory!
+
+<table>
+  <colgroup>
+    <col width="234" />
+    <col width="296" />
+    <col width="235" />
+  </colgroup>
+  <thead>
+    <tr>
+      <th>**Header Name**</th>
+      <th>**Description**</th>
+      <th>**Sample Values**</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>`Authorization`</td>
+      <td>Basic TSP token</td>
+      <td>Basic b3JncGF52Nwwevwvrftbynbvd==</td>
+    </tr>
+    <tr>
+      <td>`X-MERCHANT-ID`</td>
+      <td>End merchant’s Merchant Id for which the transaction is being initiated.</td>
+      <td>MID</td>
+    </tr>
+  </tbody>
+</table>
+
+Optional
+
+<table>
+  <colgroup>
+    <col width="234" />
+    <col width="296" />
+    <col width="235" />
+  </colgroup>
+  <thead>
+    <tr>
+      <th>**Header Name**</th>
+      <th>**Description**</th>
+      <th>**Sample Values**</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>`X-SOURCE`</td>
+      <td>Request origin source (Default: `API`)</td>
+      <td>API</td>
+    </tr>
+    <tr>
+      <td>`X-SOURCE-CHANNEL`</td>
+      <td>Request channel platform (Default: `web`)</td>
+      <td>web</td>
+    </tr>
+    <tr>
+      <td>`X-BROWSER-FINGERPRINT`</td>
+      <td>Optional client browser fingerprint</td>
+      <td>765432fr42gvd54y14532ab7b5t4r3344</td>
+    </tr>
+    <tr>
+      <td>`X-MERCHANT-APP-ID`</td>
+      <td>Optional merchant application identifier</td>
+      <td>com.exp.abc</td>
+    </tr>
+  </tbody>
+</table>
+
+### Important links
+
+- [Initiate Payment](/initiate-payment)
+- [Webhooks / callback](/webhooks-callback)
+- [Get Order Status](/get-order-status)
+- [Initiate Refund](/initiate-refund)
+- [Error Codes](/error-codes)
